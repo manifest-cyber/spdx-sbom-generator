@@ -9,6 +9,9 @@ vendor/
 #binaries
 bin/
 
+#dist
+dist/
+
 # output
 bom*
 

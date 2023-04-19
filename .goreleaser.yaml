@@ -1,0 +1,126 @@
+project_name: spdx-sbom-generator
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    main: ./cmd/generator
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+nfpms:
+  - file_name_template: '{{ .ConventionalFileName }}'
+    id: packages
+    homepage: https://github.com/manifest-cyber/spdx-sbom-generator
+    description: |-
+      A tool to help those in the community that want to generate SPDX Software Bill of Materials (SBOMs) with current package managers.
+    maintainer: Ori Avraham <ori@manifestcyber.com>
+    vendor: manifest-cyber
+    bindir: /usr/bin
+    section: utils
+    contents:
+      - src: ./LICENSES/Apache-2.0.txt
+        dst: /usr/share/doc/manifest/copyright
+        file_info:
+          mode: 0644
+    formats:
+    - apk
+    - deb
+    - rpm
+    - archlinux
+    dependencies:
+    - git
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+
+release:
+ disable: false
+ name_template: 'v{{ .Version }}'
+ github:
+   owner: manifest-cyber
+   name: spdx-sbom-generator
+
+archives:
+  - name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os | tolower }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+    - goos: windows
+      format: zip
+    builds_info:
+      group: root
+      owner: root
+    rlcp: true
+    files:
+      - README.md
+      - LICENSES/*
+
+dockers:
+- image_templates:
+  - 'ghcr.io/manifest-cyber/spdx-sbom-generator:{{ .Tag }}-amd64'
+  dockerfile: Dockerfile
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/manifest-cyber/spdx-sbom-generator/main/README.md"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Ori Avraham\",\"email\":\"ori@manifestcyber.com\"}]"
+  - "--label=io.artifacthub.package.license=Apache-2.0"
+  - "--label=org.opencontainers.image.description=A tool to help those in the community that want to generate SPDX Software Bill of Materials (SBOMs) with current package managers."
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source=https://github.com/manifest-cyber/spdx-sbom-generator"
+  - "--platform=linux/amd64"
+  extra_files:
+  - go.mod
+  - go.sum
+- image_templates:
+  - 'ghcr.io/manifest-cyber/spdx-sbom-generator:{{ .Tag }}-arm64'
+  dockerfile: Dockerfile
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/manifest-cyber/spdx-sbom-generator/main/README.md"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Ori Avraham\",\"email\":\"ori@manifestcyber.com\"}]"
+  - "--label=io.artifacthub.package.license=Apache-2.0"
+  - "--label=org.opencontainers.image.description=A tool to help those in the community that want to generate SPDX Software Bill of Materials (SBOMs) with current package managers."
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source=https://github.com/manifest-cyber/spdx-sbom-generator"
+  - "--platform=linux/arm64"
+  extra_files:
+  - go.mod
+  - go.sum
+  goarch: arm64
+docker_manifests:
+- name_template: 'ghcr.io/manifest-cyber/spdx-sbom-generator:{{ .Tag }}'
+  image_templates:
+  - 'ghcr.io/manifest-cyber/spdx-sbom-generator:{{ .Tag }}-amd64'
+  - 'ghcr.io/manifest-cyber/spdx-sbom-generator:{{ .Tag }}-arm64'
+- name_template: 'ghcr.io/manifest-cyber/spdx-sbom-generator:latest'
+  image_templates:
+  - 'ghcr.io/manifest-cyber/spdx-sbom-generator:{{ .Tag }}-amd64'
+  - 'ghcr.io/manifest-cyber/spdx-sbom-generator:{{ .Tag }}-arm64'
