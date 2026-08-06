@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       ## checks out our project source code
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
 
       ## Builds our docker image!
       - name: Build the Docker image
@@ -22,7 +22,7 @@ jobs:
       - name: Set RELEASE_VERSION env
         run: echo RELEASE_VERSION=$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev ) >> ${GITHUB_ENV}
       - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@8217e91c0369a5342a4ef2d612de87492410a666 # master
         with:
           name: spdx/spdx-sbom-generator
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -42,11 +42,11 @@ jobs:
           - goarch: arm64
             goos: windows
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
       # set current version based on release tag
       - name: Set RELEASE_VERSION env
         run: echo RELEASE_VERSION=$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev ) >> ${GITHUB_ENV}
-      - uses: wangyoucao577/go-release-action@v1.18
+      - uses: wangyoucao577/go-release-action@6b54dbdb4b64350712a1487745c0ad57007ce5fc # v1.18
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
