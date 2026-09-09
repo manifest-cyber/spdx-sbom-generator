@@ -2,7 +2,7 @@
 
 module github.com/spdx/spdx-sbom-generator
 
-go 1.17
+go 1.26.0
 
 require (
 	github.com/go-enry/go-license-detector/v4 v4.2.0
@@ -12,7 +12,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.6.1
 	github.com/vifraa/gopom v0.1.0
-	golang.org/x/mod v0.4.2
+	golang.org/x/mod v0.41.0
 )
 
 require (
